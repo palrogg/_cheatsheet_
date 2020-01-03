@@ -1,26 +1,60 @@
 import React from 'react';
-import logo from './logo.svg';
+// import {render, findDOMNode} from 'react-dom';
+import { HotTable } from '@handsontable/react';
+
+import { Buffer } from "buffer";
+import * as Colyseus from "colyseus.js";
+
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+global.Buffer = Buffer;
 
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    
+    // We connect to the Colyseus server
+    const endpoint = 'ws://localhost:2567';
+    const client = new Colyseus.Client(endpoint);
+    
+    client.joinOrCreate("chat").then(room => {
+      console.log("joined");
+      room.onStateChange.once(function(state) {
+        console.log("initial room state:", state);
+      });
+    });
+    
+    this.data = [
+      ['Planning vacances 2020', 'Dominique', 'Roger', 'Claude', 'Chantal'],
+      ['15 juin 2020', 0, 11, 12, 13],
+      ['16 juin 2020', 0, 11, 14, 13],
+      ['17 juin 2020', 0, 15, 12, 13],
+      ['18 juin 2020', 0, 15, 12, 13],
+      ['19 juin 2020', 0, 15, 12, 13],
+      ['20 juin 2020', 1, 15, 12, 13],
+      ['21 juin 2020', 0, 15, 12, 13],
+      ['22 juin 2020', 0, 15, 12, 13]
+    ];
+  }
+  
+  // TODO: find appropriate hook
+  // Handsontable.hooks.add('beforeInit', myCallback, hotInstance);
+  // afterDocumentKeyDown
+
+  
+  handleKeyPress = (event) => {
+    //  getCell(row, column, topmost)
+    
+    console.log(event.key);
+    console.log('sadfadsffads')
+    if(event.key === 'Enter'){
+      console.log('enter press here! ')
+    }
+  }
+
+  render() {
+    const settings = {licenseKey: 'non-commercial-and-evaluation'}
+    return (<HotTable onKeyPress={this.handleKeyPress} onKeyDown={this.handleKeyPress} data={this.data} settings={settings} colHeaders={true} rowHeaders={true} width="600" height="300" tabIndex="0" />);
+  }
+}
 export default App;
