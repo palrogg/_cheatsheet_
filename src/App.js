@@ -1,6 +1,7 @@
 import React from 'react';
 // import {render, findDOMNode} from 'react-dom';
 import { HotTable } from '@handsontable/react';
+import Handsontable from 'handsontable';
 
 import { Buffer } from "buffer";
 import * as Colyseus from "colyseus.js";
@@ -17,8 +18,11 @@ class App extends React.Component {
     const endpoint = 'ws://localhost:2567';
     const client = new Colyseus.Client(endpoint);
     
+    const myCallback = function(){ console.log('send move msg!'); };
+    Handsontable.hooks.add('afterDocumentKeyDown', myCallback);
+    
     client.joinOrCreate("chat").then(room => {
-      console.log("joined");
+      console.log("joined, room id: " + room.id + ", sess id: " + room.sessionId );
       room.onStateChange.once(function(state) {
         console.log("initial room state:", state);
       });
@@ -38,7 +42,6 @@ class App extends React.Component {
   }
   
   // TODO: find appropriate hook
-  // Handsontable.hooks.add('beforeInit', myCallback, hotInstance);
   // afterDocumentKeyDown
 
   
