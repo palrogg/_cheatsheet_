@@ -1,0 +1,13 @@
+{
+  "name": "Spreadshoot",
+  "description": "A Silly Multiplayer Game using Colyseus",
+  "repository": "https://github.com/palrogg/spreadshoot",
+  "logo": "",
+  "keywords": ["spreadsheet", "node", "multiplayer", "colyseus"],
+  "env": {
+    "NPM_CONFIG_PRODUCTION": {
+      "description": "Leave as 'false' to install required devDependencies.",
+      "value": "false"
+    }
+  }
+}
