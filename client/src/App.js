@@ -37,15 +37,28 @@ class App extends React.Component {
     const endpoint = 'ws://localhost:2567';
     const client = new Colyseus.Client(endpoint);
     
-    const sendKey = function(){
-      console.log('send move msg!');
-      console.log(this.getSelected());
-      this.setCellMeta(1, 3, 'className', 'c-deeporange');
+    let sendMessage = function(message){ console.log('Send message: no room joined yet') };
+    const sendKey = function(e){
+      // on enverra le key code si code >= 37 <= 40
+      console.log('key down: ' + e.key + ' | ' + e.code + ' | ' + e.keyCode);
+      if(e.keyCode > 36 && e.keyCode < 40){
+        // client.sendMessage(e.keyCode);
+        sendMessage(e.keyCode);
+        
+        console.log('Current cell: ' + this.getSelected()[0][0] + ';' + this.getSelected()[0][1]);
+        this.setCellMeta(2, 2, 'className', 'c-deeporange');
+        this.setCellMeta(this.getSelected()[0][0], this.getSelected()[0][1], 'className', 'c-enemy');  
+      }
     };
-    Handsontable.hooks.add('afterDocumentKeyDown', sendKey);
+    
     
     client.joinOrCreate("spreadshoot").then(room => {
       console.log("joined, room id: " + room.id + ", sess id: " + room.sessionId );
+      
+      sendMessage = function(){
+        console.log('eral send message')
+      }
+      
       room.onStateChange.once(function(state) {
         console.log("initial room state:", state);
       });
@@ -53,6 +66,9 @@ class App extends React.Component {
       console.error("join error", e);
       // TODO: message en clair pour utilisateur
     });
+    
+    // On ecoute les keyboard events
+    Handsontable.hooks.add('afterDocumentKeyDown', sendKey);
   }
   
   render() {
