@@ -37,7 +37,7 @@ class App extends React.Component {
     const endpoint = 'ws://localhost:2567';
     const client = new Colyseus.Client(endpoint);
     
-    let sendMessage = function(message){ console.log('Send message: no room joined yet') };
+    let sendMessage = function(keycode){ console.log('Send message: no room joined yet') };
     const sendKey = function(e){
       // on enverra le key code si code >= 37 <= 40
       console.log('key down: ' + e.key + ' | ' + e.code + ' | ' + e.keyCode);
@@ -55,8 +55,9 @@ class App extends React.Component {
     client.joinOrCreate("spreadshoot").then(room => {
       console.log("joined, room id: " + room.id + ", sess id: " + room.sessionId );
       
-      sendMessage = function(){
-        console.log('eral send message')
+      sendMessage = function(keycode){
+        room.send({ key: keycode });
+        console.log('msg sent')
       }
       
       room.onStateChange.once(function(state) {
