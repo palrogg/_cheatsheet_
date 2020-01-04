@@ -17,7 +17,7 @@ class Player extends Entity {
 
 class State extends Schema {
     @type({ map: Entity })
-    players = new MapSchema<Player>();
+    entities = new MapSchema<Player>();
 }
 
 export class SpreadshootRoom extends Room {
@@ -25,6 +25,7 @@ export class SpreadshootRoom extends Room {
     // Faire des essais...
     maxClients = 4;
     // this.tableHeight = 9;
+
   
     onCreate (options) {
       this.setState(new State());
@@ -35,7 +36,8 @@ export class SpreadshootRoom extends Room {
     onJoin (client) {
       // Add player
       this.broadcast(`${ client.sessionId } joined.`);
-      // this.state.entities[client.sessionId] = new Player();
+      console.log(this.state)
+      this.state.entities[client.sessionId] = new Player();
       // this.state.entities.push(new Player(0, 0));
     }
 
@@ -49,13 +51,22 @@ export class SpreadshootRoom extends Room {
         if('keycode' in data){
           if(data['keycode'] == 37){
             console.log('left');
+            // temp! we'll manage mvmts later
+            this.state.entities[client.sessionId].x -= 1;
           }else if(data['keycode'] == 38){
             console.log('up')
+            // temp! we'll manage mvmts later
+            this.state.entities[client.sessionId].y -= 1;
           }else if(data['keycode'] == 39){
             console.log('right')
+            // temp! we'll manage mvmts later
+            this.state.entities[client.sessionId].x += 1;
           }else if(data['keycode'] == 40){
             console.log('down')
+            // temp! we'll manage mvmts later
+            this.state.entities[client.sessionId].y += 1;
           }
+          console.log('Player position is now', this.state.entities[client.sessionId].x, ',', this.state.entities[client.sessionId].y)
         }
         
         this.broadcast(`(${ client.sessionId }) ${ data.message }`);
