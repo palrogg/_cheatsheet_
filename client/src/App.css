@@ -22,3 +22,8 @@
 .App-link {
   color: #09d3ac;
 }
+
+.c-enemy {
+  box-shadow: 0 0 0 2px #5292F7 inset;
+  
+}
