@@ -14,20 +14,6 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     
-    // We connect to the Colyseus server
-    const endpoint = 'ws://localhost:2567';
-    const client = new Colyseus.Client(endpoint);
-    
-    const myCallback = function(){ console.log('send move msg!'); };
-    Handsontable.hooks.add('afterDocumentKeyDown', myCallback);
-    
-    client.joinOrCreate("chat").then(room => {
-      console.log("joined, room id: " + room.id + ", sess id: " + room.sessionId );
-      room.onStateChange.once(function(state) {
-        console.log("initial room state:", state);
-      });
-    });
-    
     this.data = [
       ['Planning vacances 2020', 'Dominique', 'Roger', 'Claude', 'Chantal'],
       ['15 juin 2020', 0, 11, 12, 13],
@@ -39,25 +25,42 @@ class App extends React.Component {
       ['21 juin 2020', 0, 15, 12, 13],
       ['22 juin 2020', 0, 15, 12, 13]
     ];
-  }
-  
-  // TODO: find appropriate hook
-  // afterDocumentKeyDown
-
-  
-  handleKeyPress = (event) => {
-    //  getCell(row, column, topmost)
+    this.id = 'main';
+    this.hotSettings = {
+       data: this.data,
+       colHeaders: true,
+       rowHeaders: true,
+       licenseKey: 'non-commercial-and-evaluation'
+     };
+    this.hotTableComponent = React.createRef();
+    // We connect to the Colyseus server
+    const endpoint = 'ws://localhost:2567';
+    const client = new Colyseus.Client(endpoint);
     
-    console.log(event.key);
-    console.log('sadfadsffads')
-    if(event.key === 'Enter'){
-      console.log('enter press here! ')
-    }
+    const sendKey = function(){
+      console.log('send move msg!');
+      console.log(this.getSelected());
+      this.setCellMeta(1, 3, 'className', 'c-deeporange');
+    };
+    Handsontable.hooks.add('afterDocumentKeyDown', sendKey);
+    
+    client.joinOrCreate("spreadshoot").then(room => {
+      console.log("joined, room id: " + room.id + ", sess id: " + room.sessionId );
+      room.onStateChange.once(function(state) {
+        console.log("initial room state:", state);
+      });
+    }).catch(e => {
+      console.error("join error", e);
+      // TODO: message en clair pour utilisateur
+    });
   }
-
+  
   render() {
-    const settings = {licenseKey: 'non-commercial-and-evaluation'}
-    return (<HotTable onKeyPress={this.handleKeyPress} onKeyDown={this.handleKeyPress} data={this.data} settings={settings} colHeaders={true} rowHeaders={true} width="600" height="300" tabIndex="0" />);
+    return (
+      <div>
+       <HotTable ref={this.hotTableComponent} id={this.id} settings={this.hotSettings} tabIndex="0"  />
+      </div>
+    )
   }
 }
 export default App;
