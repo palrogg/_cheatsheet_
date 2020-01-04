@@ -17,7 +17,8 @@ class App extends React.Component {
     this.state = {
       name: 'Roger',
       playerId: 'en attente',
-      roomId: 'en attente'
+      roomId: 'en attente',
+      enemies: []
     };
     
     this.data = [
@@ -39,6 +40,10 @@ class App extends React.Component {
        data: this.data,
        colHeaders: true,
        rowHeaders: true,
+       rowHeights: 24,
+       // rowWidths: 500,
+       // manualColumnResize: true,
+       // manualRowResize: true,
        selectionMode: 'single',
        licenseKey: 'non-commercial-and-evaluation'
      };
@@ -72,8 +77,6 @@ class App extends React.Component {
         room.send({ keycode: keycode });
       }
       
-      console.log('Len', room.state.entities.length, room.state.entities)
-      
       room.state.entities.onAdd = (entity, sessionId: string) => {
           // is current player
           if (sessionId === room.sessionId) {
@@ -84,6 +87,17 @@ class App extends React.Component {
             console.log('entity add: other player')
             this.hotTableComponent.current.hotInstance.setCellMeta(entity.y, entity.x, 'className', 'c-enemy ' + sessionId);
             this.hotTableComponent.current.hotInstance.render()
+            
+            console.log(entity);
+            this.setState(prevState => ({
+              enemies: [...prevState.enemies,
+                {
+                  x: entity.x,
+                  y: entity.y,
+                  playerId: sessionId
+                }
+              ]
+            }));
           }
           
           entity.onChange = (changes) => {
@@ -93,7 +107,22 @@ class App extends React.Component {
             }else{
               // Enemy moved
               console.log('Enemy moved')
+              let newEnemies = Object.assign({}, this.state.enemies);
+              
+              for (var i in newEnemies) {
+                if(newEnemies[i]['playerId'] === sessionId){
+                  console.log('before', newEnemies[i])
+                  newEnemies[i].x = entity.x;
+                  newEnemies[i].y = entity.y;
+                  console.log('after', newEnemies[i])
+                  break;
+                }
+              }
+              // this.setState({enemies: newEnemies});
+              
+              // for dirty debug
               this.hotTableComponent.current.hotInstance.setCellMeta(entity.y, entity.x, 'className', 'c-enemy');
+              this.hotTableComponent.current.hotInstance.render();
             }
           }
       };
@@ -104,24 +133,48 @@ class App extends React.Component {
     
     // On ecoute les keyboard events
     Handsontable.hooks.add('beforeKeyDown', sendKey);
+    
+
   }
   
-  
+
   
   render() {
+    function EnemyCell({ x = 0, y = 0, name = 'Andrew' }) {
+      let style = {
+        left: 50 * y + (Math.random()*5),
+        top: 24 * x
+      };
+      return (
+        <div className="enemyCell" style={style}>
+        Raoul
+        </div>
+      )
+    }
+    
     let debugBox;
     if(debug && this.playerId){
-      debugBox = 'Player id: ' + this.state.playerId + ', room id: ' + this.state.roomId;
+      debugBox = 'Player id: ' + this.state.playerId + ', room id: ' + this.state.roomId + ', enemies: ' + this.state.enemies.length;
     }else{
       debugBox = '';
     }
-    console.log(this.props)
+    
+    // const EnemyCell = ;
+    
     return (
       <div className="main">
+        
         <h2><img className="logo" src="logo-400.png" alt="logo" /> Vacances 2020</h2>
         <p>Vous êtes <b>{this.state.name}</b>.</p>
         <p>[{debugBox}]</p>
-        <HotTable ref={this.hotTableComponent} id={this.id} settings={this.hotSettings} tabIndex="0"  />
+        <div className="tableContainer">
+          <div className="enemyLayer">
+              {this.state.enemies.length > 0 ? this.state.enemies.map(function(item, index){
+                    return <EnemyCell key={index} x={item.x} y={item.y} enemyId={item.id} />;
+              }): ''}
+          </div>
+          <HotTable ref={this.hotTableComponent} id={this.id} settings={this.hotSettings} tabIndex="0"  />
+        </div>
       </div>
     )
   }
