@@ -74,6 +74,10 @@ export class SpreadshootRoom extends Room {
       return newPos;
     }
     
+    didCollide() {
+      // TODO
+    }
+    
     // TODO: gestion deplacements
     onMessage (client, data) {
         console.log("Message from", client.sessionId, ":", data);
