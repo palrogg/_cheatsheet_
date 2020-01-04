@@ -74,8 +74,10 @@ class App extends React.Component {
   
   render() {
     return (
-      <div>
-       <HotTable ref={this.hotTableComponent} id={this.id} settings={this.hotSettings} tabIndex="0"  />
+      <div className="main">
+        
+        <h2><img class="logo" src="logo-400.png" alt="logo" /> Vacances 2020</h2>
+        <HotTable ref={this.hotTableComponent} id={this.id} settings={this.hotSettings} tabIndex="0"  />
       </div>
     )
   }

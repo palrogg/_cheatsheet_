@@ -4,8 +4,19 @@
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
+.main {
+  /* margin-left: 1em; */
+}
+
+h2 {
+  font-size: 18px;
+  font-weight: normal;
+  padding: .2em;
+  border-bottom: 1px solid #ccc;
+}
+
+.logo {
+  max-width: 100px;
 }
 
 .App-header {
