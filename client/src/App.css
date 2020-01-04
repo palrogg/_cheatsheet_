@@ -30,11 +30,19 @@ h2 {
   color: white;
 }
 
+td {
+  /* border: 2px solid red !important; */
+}
+
 .App-link {
   color: #09d3ac;
 }
 
 .c-enemy {
-  box-shadow: 0 0 0 2px #5292F7 inset;
+  box-shadow: 0 0 0 2px #5292F7 inset !important;
   
+}
+
+.area {
+  border: 4px solid red !important;
 }
