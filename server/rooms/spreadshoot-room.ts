@@ -10,6 +10,7 @@ const bounds = {
 const MIN_ROW_NUMBER = 1; // 0 = ligne du header
 const MAX_ROW_NUMBER = 8;
 const TABLE_WIDTH = 5;
+const COLORS = ['red', 'green', 'blue', 'orange', 'purple'];
 
 // Reference: https://docs.colyseus.io/state/schema/
 class Entity extends Schema {
@@ -23,6 +24,9 @@ class Entity extends Schema {
 class Player extends Entity {
   @type("boolean")
   connected: boolean = true;
+  
+  @type("number")
+  colorId: 0;
 }
 
 class State extends Schema {
