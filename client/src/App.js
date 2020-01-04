@@ -85,7 +85,7 @@ class App extends React.Component {
           }else{
             // enemy: we draw him
             console.log('entity add: other player')
-            this.hotTableComponent.current.hotInstance.setCellMeta(entity.y, entity.x, 'className', 'c-enemy ' + sessionId);
+            this.hotTableComponent.current.hotInstance.setCellMeta(entity.y, entity.x, 'className', 'c-enemy');
             this.hotTableComponent.current.hotInstance.render()
             
             console.log(entity);
@@ -112,6 +112,11 @@ class App extends React.Component {
               for (var i in newEnemies) {
                 if(newEnemies[i]['playerId'] === sessionId){
                   console.log('before', newEnemies[i])
+                  
+                  // dirty but easy
+                  this.hotTableComponent.current.hotInstance.setCellMeta(newEnemies[i].y, newEnemies[i].x, 'className', '');
+                  this.hotTableComponent.current.hotInstance.render();
+                                    
                   newEnemies[i].x = entity.x;
                   newEnemies[i].y = entity.y;
                   console.log('after', newEnemies[i])
@@ -140,7 +145,7 @@ class App extends React.Component {
 
   
   render() {
-    function EnemyCell({ x = 0, y = 0, name = 'Andrew' }) {
+    /*function EnemyCell({ x = 0, y = 0, name = 'Andrew' }) {
       let style = {
         left: 50 * y + (Math.random()*5),
         top: 24 * x
@@ -150,7 +155,7 @@ class App extends React.Component {
         Raoul
         </div>
       )
-    }
+    }*/
     
     let debugBox;
     if(debug && this.playerId){
@@ -168,11 +173,11 @@ class App extends React.Component {
         <p>Vous êtes <b>{this.state.name}</b>.</p>
         <p>[{debugBox}]</p>
         <div className="tableContainer">
-          <div className="enemyLayer">
+          {/*<div className="enemyLayer">
               {this.state.enemies.length > 0 ? this.state.enemies.map(function(item, index){
                     return <EnemyCell key={index} x={item.x} y={item.y} enemyId={item.id} />;
               }): ''}
-          </div>
+          </div>*/}
           <HotTable ref={this.hotTableComponent} id={this.id} settings={this.hotSettings} tabIndex="0"  />
         </div>
       </div>

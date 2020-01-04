@@ -43,8 +43,8 @@ td {
 }
 
 .c-enemy {
-  box-shadow: 0 0 0 2px #5292F7 inset !important;
-  border: 2px solid red !important;
+  box-shadow: 0 0 0 2px green inset !important;
+  /* border: 2px solid green !important; */
 }
 
 /* google style */
