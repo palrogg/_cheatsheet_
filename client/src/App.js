@@ -41,7 +41,7 @@ class App extends React.Component {
     const sendKey = function(e){
       // on enverra le key code si code >= 37 <= 40
       console.log('key down: ' + e.key + ' | ' + e.code + ' | ' + e.keyCode);
-      if(e.keyCode > 36 && e.keyCode < 40){
+      if(e.keyCode >= 37 && e.keyCode <= 40){
         // client.sendMessage(e.keyCode);
         sendMessage(e.keyCode);
         
@@ -54,9 +54,9 @@ class App extends React.Component {
     
     client.joinOrCreate("spreadshoot").then(room => {
       console.log("joined, room id: " + room.id + ", sess id: " + room.sessionId );
-      
+      console.log("Table size: ", this.data.length, this.data[0].length);
       sendMessage = function(keycode){
-        room.send({ key: keycode });
+        room.send({ keycode: keycode });
         console.log('msg sent')
       }
       
