@@ -51,7 +51,7 @@ class App extends React.Component {
         this.setCellMeta(3, 3, 'className', 'c-enemy');
         this.setCellMeta(this.getSelected()[0][0], this.getSelected()[0][1], 'className', 'c-enemy'); 
         
-        this.selectCell(1, 1);
+        // this.selectCell(row, xxx);
       }
     };
     
@@ -67,7 +67,15 @@ class App extends React.Component {
       room.state.entities.onAdd = (entity, sessionId: string) => {
           console.log('entity add!')
 
+          // is current player
+          if (sessionId === room.sessionId) {
+              console.log('me')
+          }
+          
           entity.onChange = (changes) => {
+            console.log(changes);
+            console.log(this);
+            this.hotTableComponent.current.hotInstance.selectCell(entity.y, entity.x);
             console.log('entity change!')
           }
       };
