@@ -42,12 +42,16 @@ class App extends React.Component {
       // on enverra le key code si code >= 37 <= 40
       console.log('key down: ' + e.key + ' | ' + e.code + ' | ' + e.keyCode);
       if(e.keyCode >= 37 && e.keyCode <= 40){
+        e.stopImmediatePropagation();
         // client.sendMessage(e.keyCode);
         sendMessage(e.keyCode);
         
         console.log('Current cell: ' + this.getSelected()[0][0] + ';' + this.getSelected()[0][1]);
         this.setCellMeta(2, 2, 'className', 'c-deeporange');
-        this.setCellMeta(this.getSelected()[0][0], this.getSelected()[0][1], 'className', 'c-enemy');  
+        this.setCellMeta(3, 3, 'className', 'c-enemy');
+        this.setCellMeta(this.getSelected()[0][0], this.getSelected()[0][1], 'className', 'c-enemy'); 
+        
+        this.selectCell(1, 1);
       }
     };
     
@@ -60,16 +64,20 @@ class App extends React.Component {
         console.log('msg sent')
       }
       
-      room.onStateChange.once(function(state) {
-        console.log("initial room state:", state);
-      });
+      room.state.entities.onAdd = (entity, sessionId: string) => {
+          console.log('entity add!')
+
+          entity.onChange = (changes) => {
+            console.log('entity change!')
+          }
+      };
     }).catch(e => {
       console.error("join error", e);
       // TODO: message en clair pour utilisateur
     });
     
     // On ecoute les keyboard events
-    Handsontable.hooks.add('afterDocumentKeyDown', sendKey);
+    Handsontable.hooks.add('beforeKeyDown', sendKey);
   }
   
   render() {
