@@ -1,6 +1,7 @@
 import { Room } from "colyseus";
 import { Schema, MapSchema, type } from "@colyseus/schema";
 
+// limites du tableau
 const bounds = {
   // min, max, range
   'x': [0, 4, 5],
@@ -25,8 +26,17 @@ class Player extends Entity {
   @type("boolean")
   connected: boolean = true;
   
+  @type("boolean")
+  dead: boolean = false;
+  
   @type("number")
-  colorId: 0;
+  score: number = 0;
+  
+  @type("number")
+  deaths: number = 0;
+  
+  @type("number")
+  colorId: number = 0;
 }
 
 class State extends Schema {
@@ -36,10 +46,7 @@ class State extends Schema {
 
 export class SpreadshootRoom extends Room {
     
-    // Faire des essais...
     maxClients = 4;
-    // this.tableHeight = 9;
-
   
     onCreate (options) {
       this.setState(new State());
@@ -52,7 +59,6 @@ export class SpreadshootRoom extends Room {
       this.broadcast(`${ client.sessionId } joined.`);
       console.log(this.state)
       this.state.entities[client.sessionId] = new Player();
-      // this.state.entities.push(new Player(0, 0));
     }
 
     onLeave (client) {
@@ -74,13 +80,37 @@ export class SpreadshootRoom extends Room {
       return newPos;
     }
     
-    didCollide() {
-      // TODO
+    respawn(deadPlayerId){
+      console.log('Respawning', deadPlayerId);
+      this.state.entities[deadPlayerId].x = 0;
+      this.state.entities[deadPlayerId].y = 0;
+      this.state.entities[deadPlayerId].dead = false;
+    }
+    
+    didCollide(invaderId, x, y) {
+      for (var i in this.state.entities){
+        if ( i != invaderId && !this.state.entities[i].dead ) { // check if same player && not waiting to respawn
+          if ( this.state.entities[i].x == x && this.state.entities[i].y == y ){
+            // Attrapé!!
+            console.log('Player', i, 'INVADED!');
+            this.state.entities[i].dead = true;
+            this.state.entities[i].deaths += 1;
+            this.state.entities[invaderId].score += 1;
+            
+            setTimeout(() => { this.respawn(i) }, 2000);
+          }
+        }
+      }
     }
     
     // TODO: gestion deplacements
     onMessage (client, data) {
         console.log("Message from", client.sessionId, ":", data);
+        
+        if(this.state.entities[client.sessionId].dead){
+          return;
+        }
+        
         if('keycode' in data){
           if(data['keycode'] == 37){
             // left
@@ -97,6 +127,7 @@ export class SpreadshootRoom extends Room {
             this.state.entities[client.sessionId].y = this.getNewPosition(this.state.entities[client.sessionId], 'y', 1);
           }
           console.log('Player position is now', this.state.entities[client.sessionId].x, ',', this.state.entities[client.sessionId].y)
+          this.didCollide(client.sessionId, this.state.entities[client.sessionId].x, this.state.entities[client.sessionId].y);
         }
         
         this.broadcast(`(${ client.sessionId }) ${ data.message }`);
