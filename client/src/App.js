@@ -18,7 +18,10 @@ class App extends React.Component {
       name: 'Roger',
       playerId: 'en attente',
       roomId: 'en attente',
-      enemies: []
+      enemies: [],
+      dead: false,
+      score: 0,
+      deaths: 0
     };
     
     this.data = [
@@ -32,10 +35,6 @@ class App extends React.Component {
       ['21 juin 2020', 0, 15, 12, 13],
       ['22 juin 2020', 0, 15, 12, 13]
     ];
-    this.id = 'main';
-    this.playerId = 'en attente';
-    
-    this.players = [];
     this.hotSettings = {
        data: this.data,
        colHeaders: true,
@@ -94,7 +93,8 @@ class App extends React.Component {
                 {
                   x: entity.x,
                   y: entity.y,
-                  playerId: sessionId
+                  playerId: sessionId,
+                  score: entity.score
                 }
               ]
             }));
@@ -104,6 +104,12 @@ class App extends React.Component {
             if (sessionId === room.sessionId) {
               // Player moved
               this.hotTableComponent.current.hotInstance.selectCell(entity.y, entity.x);
+              this.setState({score: entity.score, dead: entity.dead, deaths: entity.deaths});
+              
+              // Mort du joueur
+              if(entity.dead){
+                this.hotTableComponent.current.hotInstance.setDataAtCell(entity.y, entity.x, "† Perdu †");
+              }
             }else{
               // Enemy moved
               console.log('Enemy moved')
@@ -145,6 +151,7 @@ class App extends React.Component {
 
   
   render() {
+    // TODO: le nom de l’enemi / tout remanier
     /*function EnemyCell({ x = 0, y = 0, name = 'Andrew' }) {
       let style = {
         left: 50 * y + (Math.random()*5),
@@ -158,7 +165,7 @@ class App extends React.Component {
     }*/
     
     let debugBox;
-    if(debug && this.playerId){
+    if(debug){
       debugBox = 'Player id: ' + this.state.playerId + ', room id: ' + this.state.roomId + ', enemies: ' + this.state.enemies.length;
     }else{
       debugBox = '';
@@ -170,7 +177,7 @@ class App extends React.Component {
       <div className="main">
         
         <h2><img className="logo" src="logo-400.png" alt="logo" /> Vacances 2020</h2>
-        <p>Vous êtes <b>{this.state.name}</b>.</p>
+        <p>Vous êtes <b>{this.state.name}</b>. Votre score: {this.state.score} points. Vous êtes {this.state.dead ? 'mort' : '(encore) vivant'}.</p>
         <p>[{debugBox}]</p>
         <div className="tableContainer">
           {/*<div className="enemyLayer">
