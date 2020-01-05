@@ -6,7 +6,7 @@ A silly minigame to quickly practice using [Colyseus](https://github.com/colyseu
 
 Lots of bugs client-side (enemies gets hidden when you move) and server-side (no proper cleaning of disconnected players).
 
-Built using React and [Handsontable](https://github.com/handsontable/handsontable).
+Built using React, [Handsontable](https://github.com/handsontable/handsontable) for the spreadsheet stuff, [i18next](https://github.com/i18next/i18next) for translation.
 
 <img src="screen_record.gif" alt="screen recording" />
 
