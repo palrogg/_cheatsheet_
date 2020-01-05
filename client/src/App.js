@@ -3,7 +3,6 @@ import React, { Suspense } from 'react';
 import { HotTable } from '@handsontable/react';
 import Handsontable from 'handsontable';
 import { useTranslation, Trans, Translation, withTranslation } from 'react-i18next';
-import i18n from 'i18next';
 
 import { Buffer } from "buffer";
 import * as Colyseus from "colyseus.js";
@@ -23,13 +22,15 @@ class Spreadshoot extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: 'Roger',
+      name: '',
       playerId: 'en attente',
       roomId: 'en attente',
+      nameId: 0,
       enemies: [],
       dead: false,
       score: 0,
       deaths: 0,
+      servermessage: 'Server message: welcome',
       error: false
     };
     
@@ -74,7 +75,7 @@ class Spreadshoot extends React.Component {
       }
     };
     
-    
+
     client.joinOrCreate("spreadshoot").then(room => {
       console.log("joined, room id: " + room.id + ", sess id: " + room.sessionId );
       this.setState({'playerId': room.sessionId, 'roomId': room.id});
@@ -86,23 +87,34 @@ class Spreadshoot extends React.Component {
       }
       
       room.state.entities.onAdd = (entity, sessionId: string) => {
+          if (!this.hotTableComponent.current){
+            console.error('No current hotTable')
+            this.error = 'Please reload the page';
+            return;
+          }
+        
           // is current player
           if (sessionId === room.sessionId) {
-            console.log('entity add: this is me!')
+            console.log('entity add: this is me!', NAME_LIST[entity.nameId]);
+            console.log(entity);
+            this.setState({name: NAME_LIST[entity.nameId], nameId: entity.nameId});
             this.hotTableComponent.current.hotInstance.selectCell(entity.y, entity.x);
           }else{
             // enemy: we draw him
-            console.log('entity add: other player')
+            console.log('entity add: other player at position', entity.x, ',', entity.y, NAME_LIST[entity.nameId])
+            
+            this.setState({servermessage: NAME_LIST[entity.nameId] + ' joined the game!'})
+            
             this.hotTableComponent.current.hotInstance.setCellMeta(entity.y, entity.x, 'className', 'c-enemy');
             this.hotTableComponent.current.hotInstance.render()
             
-            console.log(entity);
             this.setState(prevState => ({
               enemies: [...prevState.enemies,
                 {
                   x: entity.x,
                   y: entity.y,
                   playerId: sessionId,
+                  nameId: entity.nameId, // used for color and dummy name
                   score: entity.score
                 }
               ]
@@ -110,6 +122,12 @@ class Spreadshoot extends React.Component {
           }
           
           entity.onChange = (changes) => {
+            if (!this.hotTableComponent.current){
+              console.error('No current hotTable')
+              this.error = 'Please reload the page';
+              return;
+            }
+            
             if (sessionId === room.sessionId) {
               // Player moved
               this.hotTableComponent.current.hotInstance.selectCell(entity.y, entity.x);
@@ -128,9 +146,9 @@ class Spreadshoot extends React.Component {
                 if(newEnemies[i]['playerId'] === sessionId){
                   console.log('before', newEnemies[i])
                   
-                  // dirty but easy
-                  this.hotTableComponent.current.hotInstance.setCellMeta(newEnemies[i].y, newEnemies[i].x, 'className', '');
-                  this.hotTableComponent.current.hotInstance.render();
+                  // clear enemy path -- dirty but easy
+                  // this.hotTableComponent.current.hotInstance.setCellMeta(newEnemies[i].y, newEnemies[i].x, 'className', '');
+                  // this.hotTableComponent.current.hotInstance.render();
                                     
                   newEnemies[i].x = entity.x;
                   newEnemies[i].y = entity.y;
@@ -138,10 +156,9 @@ class Spreadshoot extends React.Component {
                   break;
                 }
               }
-              // this.setState({enemies: newEnemies});
               
-              // for dirty debug
-              this.hotTableComponent.current.hotInstance.setCellMeta(entity.y, entity.x, 'className', 'c-enemy');
+              // Show enemies -- currently handsontable seems to erase it :/
+              this.hotTableComponent.current.hotInstance.setCellMeta(entity.y, entity.x, 'className', 'c-enemy ' + COLOR_LIST[entity.nameId]);
               this.hotTableComponent.current.hotInstance.render();
             }
           }
@@ -177,14 +194,31 @@ class Spreadshoot extends React.Component {
       debugBox = '';
     }
     
+    function ConnectedPlayers(props) {
+      if (props.enemy_count > 0){
+        return <p>{props.enemy_count + 1} <Trans i18nKey="connected_players" /></p>
+      }else{
+        return <p><Trans i18nKey="connected_alone" /></p>
+      }
+    }
+    
+    function ServerMessage(props) {
+      if (props.message){
+        return <p className="server_message">{props.message}</p>
+      }else{
+        return '';
+      }
+    }
+    
     // const EnemyCell = ;
     
     return (
       <div className="main">
         <section className="header">
-        
-          <h2><img className="logo" src="logo-400.png" alt="logo" /> <Trans i18nKey="spreadsheet_title" /></h2>
+          <h1><img className="logo" src="logo-400.png" alt="Spreadshoot" /></h1>
+          <h2><Trans i18nKey="spreadsheet_title" /><br /><span className="menu">Wolf Game In A Spreadsheet</span></h2>
           
+          <button className="share">Share</button>
           <div className='language_selection'>
               <Translation>
                 {
@@ -198,15 +232,20 @@ class Spreadshoot extends React.Component {
               </Translation>
             </div>
             <div className="clear" />
+            </section>
+              
+            <hr className="separator" />
+            
+            <section className="body">
             <p><Trans i18nKey="short_instruction" /></p>
+            
+            <ConnectedPlayers enemy_count={this.state.enemies.length} />
+            <ServerMessage message={this.state.servermessage} />
             {this.state.error ? <p className="error"><Trans i18nKey={this.state.error} /></p> : ''}
-        </section>
           
         <hr className="separator" />
         
-        <section className="body">
-        
-          <p><Trans i18nKey="you_are" /> <b>{this.state.name}</b>. <Trans i18nKey="your_score" />: {this.state.score} <Trans i18nKey="points" />. <Trans i18nKey="you_are" /> {this.state.dead ? <Trans i18nKey="dead" /> : <Trans i18nKey="alive" />}.</p>
+          <p><Trans i18nKey="you_are" /> <b>{this.state.name}</b>. <Trans i18nKey="your_score" />: {this.state.score} <Trans i18nKey="points" />. <Trans i18nKey="you_are" /> {this.state.dead ? <b><Trans i18nKey="dead" /></b> : <Trans i18nKey="alive" />}.</p>
           <p>[{debugBox}]</p>
           <div className="tableContainer">
             {/*<div className="enemyLayer">
