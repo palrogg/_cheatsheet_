@@ -1,11 +1,15 @@
 ## Spreadshoot
 
-Les plannings x [Colyseus (moteur de jeu multijoueur)](https://github.com/colyseus/colyseus) x [Un clone de Spreadsheets](https://github.com/handsontable/handsontable)!
+2020\. Time to fight for the Holiday Planning!
 
-A pas utiliser en l'état, c'est un create-react-app rapide. Work in progress...
+A silly minigame which purpose was to practice [Colyseus](https://github.com/colyseus/).
 
-### Source icones
+Built using React and [Handsontable](https://github.com/handsontable/handsontable).
 
-Cible CC-BY SVGrepo https://www.svgrepo.com/svg/127638/target
+<img src="screen_record.gif" alt="screen recording" />
 
-G Suite no-attribution https://www.pngguru.com/free-transparent-background-png-clipart-gbehd
+### Icon sources
+
+Target: CC-BY SVGrepo https://www.svgrepo.com/svg/127638/target
+
+Google Spreadsheet icon: no-attribution https://www.pngguru.com/free-transparent-background-png-clipart-gbehd
