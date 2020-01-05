@@ -147,8 +147,8 @@ class Spreadshoot extends React.Component {
                   console.log('before', newEnemies[i])
                   
                   // clear enemy path -- dirty but easy
-                  // this.hotTableComponent.current.hotInstance.setCellMeta(newEnemies[i].y, newEnemies[i].x, 'className', '');
-                  // this.hotTableComponent.current.hotInstance.render();
+                  this.hotTableComponent.current.hotInstance.setCellMeta(newEnemies[i].y, newEnemies[i].x, 'className', '');
+                  this.hotTableComponent.current.hotInstance.render();
                                     
                   newEnemies[i].x = entity.x;
                   newEnemies[i].y = entity.y;
@@ -216,9 +216,9 @@ class Spreadshoot extends React.Component {
       <div className="main">
         <section className="header">
           <h1><img className="logo" src="logo-400.png" alt="Spreadshoot" /></h1>
-          <h2><Trans i18nKey="spreadsheet_title" /><br /><span className="menu">Wolf Game In A Spreadsheet</span></h2>
+          <h2><Trans i18nKey="spreadsheet_title" /><br /><span className="menu" title="nope"><Trans i18nKey="fake_menu" /></span></h2>
           
-          <button className="share">Share</button>
+          <button className="share" title="nope"><Trans i18nKey="share" /></button>
           <div className='language_selection'>
               <Translation>
                 {
