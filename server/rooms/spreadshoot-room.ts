@@ -11,7 +11,8 @@ const bounds = {
 const MIN_ROW_NUMBER = 1; // 0 = ligne du header
 const MAX_ROW_NUMBER = 8;
 const TABLE_WIDTH = 5;
-let available_slots = [0, 1, 2, 3];
+
+let availableNameIds = [0, 1, 2, 3, 4];
 
 // Reference: https://docs.colyseus.io/state/schema/
 class Entity extends Schema {
@@ -58,11 +59,19 @@ export class SpreadshootRoom extends Room {
       // Add player
       this.broadcast(`${ client.sessionId } joined.`);
       console.log(this.state)
-      this.state.entities[client.sessionId] = new Player();
+      
+      if(availableNameIds.length < 1){
+        availableNameIds = [0, 1, 2, 3, 4];
+      }
+      let playerNameId = availableNameIds.splice(Math.floor(Math.random() * availableNameIds.length), 1)[0];
+      console.log('Name id will be', playerNameId);
+      this.state.entities[client.sessionId] = new Player({x: 1, nameId: playerNameId});
+      this.state.entities[client.sessionId].nameId = playerNameId;
     }
 
     onLeave (client) {
-        this.broadcast(`${ client.sessionId } left.`);
+      this.broadcast(`${ client.sessionId } left.`);
+      delete this.state.entities[client.sessionId];
     }
     
     getNewPosition (entity, axis, factor, steps = 1) {
