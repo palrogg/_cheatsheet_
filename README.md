@@ -2,7 +2,7 @@
 
 2020\. Time to fight for the Holiday Planning!
 
-A silly minigame to quickly practice using [Colyseus](https://github.com/colyseus/).
+A silly minigame to quickly practice using Multiplayer Game Server [Colyseus](https://github.com/colyseus/).
 
 Lots of bugs client-side (enemies gets hidden when you move) and server-side (no proper cleaning of disconnected players).
 
