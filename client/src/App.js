@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 // import {render, findDOMNode} from 'react-dom';
 import { HotTable } from '@handsontable/react';
 import Handsontable from 'handsontable';
+import { useTranslation, Trans, Translation, withTranslation } from 'react-i18next';
+import i18n from 'i18next';
 
 import { Buffer } from "buffer";
 import * as Colyseus from "colyseus.js";
@@ -10,8 +12,14 @@ import './App.css';
 
 global.Buffer = Buffer;
 const debug = true;
+const ENDPOINT = (process.env.NODE_ENV==="development")
+    ? "ws://localhost:2567"
+    : "ws://dogfight.tcch.ch:2567";
 
-class App extends React.Component {
+const NAME_LIST = ['Dominique', 'Roger', 'Claude', 'Chantal', 'Alfred'];
+const COLOR_LIST = ['red', 'green', 'blue', 'orange', 'purple'];
+
+class Spreadshoot extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -40,6 +48,7 @@ class App extends React.Component {
        colHeaders: true,
        rowHeaders: true,
        rowHeights: 24,
+       // disableVisualSelection: true,
        // rowWidths: 500,
        // manualColumnResize: true,
        // manualRowResize: true,
@@ -49,8 +58,7 @@ class App extends React.Component {
     this.hotTableComponent = React.createRef();
     
     // On se connecte au Colyseus server
-    const endpoint = 'ws://localhost:2567';
-    const client = new Colyseus.Client(endpoint);
+    const client = new Colyseus.Client(ENDPOINT);
     
     let sendMessage = function(keycode){ console.log('Send message: no room joined yet') };
     const sendKey = function(e){
@@ -176,8 +184,23 @@ class App extends React.Component {
     return (
       <div className="main">
         
-        <h2><img className="logo" src="logo-400.png" alt="logo" /> Vacances 2020</h2>
-        <p>Vous êtes <b>{this.state.name}</b>. Votre score: {this.state.score} points. Vous êtes {this.state.dead ? 'mort' : '(encore) vivant'}.</p>
+        <h2><img className="logo" src="logo-400.png" alt="logo" /> <Trans i18nKey="spreadsheet_title" /></h2>
+        
+        <section className='section_language'>
+            <Translation>
+              {
+                (t, { i18n }) => (
+                  <div>
+                    <button onClick={() => i18n.changeLanguage('en')}>en</button>
+                    <button onClick={() => i18n.changeLanguage('fr')}>fr</button>
+                  </div>
+                )
+              }
+            </Translation>
+          </section>
+        <p><Trans i18nKey="short_instruction" /></p>
+        
+        <p><Trans i18nKey="you_are" /> <b>{this.state.name}</b>. <Trans i18nKey="your_score" />: {this.state.score} <Trans i18nKey="points" />. <Trans i18nKey="you_are" /> {this.state.dead ? <Trans i18nKey="dead" /> : <Trans i18nKey="alive" />}.</p>
         <p>[{debugBox}]</p>
         <div className="tableContainer">
           {/*<div className="enemyLayer">
@@ -188,7 +211,19 @@ class App extends React.Component {
           <HotTable ref={this.hotTableComponent} id={this.id} settings={this.hotSettings} tabIndex="0"  />
         </div>
       </div>
-    )
+    );
   }
 }
-export default App;
+    
+function Page() {
+  useTranslation();
+  const SpreadshootHOC = withTranslation()(Spreadshoot);
+  return <SpreadshootHOC />
+}
+export default function App() {
+  return (
+    <Suspense fallback="loading">
+      <Page />
+    </Suspense>
+  );
+}
