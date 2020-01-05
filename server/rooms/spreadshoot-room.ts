@@ -11,7 +11,7 @@ const bounds = {
 const MIN_ROW_NUMBER = 1; // 0 = ligne du header
 const MAX_ROW_NUMBER = 8;
 const TABLE_WIDTH = 5;
-const COLORS = ['red', 'green', 'blue', 'orange', 'purple'];
+let available_slots = [0, 1, 2, 3];
 
 // Reference: https://docs.colyseus.io/state/schema/
 class Entity extends Schema {
@@ -36,7 +36,7 @@ class Player extends Entity {
   deaths: number = 0;
   
   @type("number")
-  colorId: number = 0;
+  nameId: number = 0;
 }
 
 class State extends Schema {
