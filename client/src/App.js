@@ -29,7 +29,8 @@ class Spreadshoot extends React.Component {
       enemies: [],
       dead: false,
       score: 0,
-      deaths: 0
+      deaths: 0,
+      error: false
     };
     
     this.data = [
@@ -146,20 +147,17 @@ class Spreadshoot extends React.Component {
           }
       };
     }).catch(e => {
-      console.error("join error", e);
-      // TODO: message d’erreur pour utilisateur + invitation à refresh (pour 1e version)
+      this.setState({'error': 'error_cant_connect'});
+      console.log("join error", e);
+      // TODO: user-friendly error message
     });
     
     // On ecoute les keyboard events
     Handsontable.hooks.add('beforeKeyDown', sendKey);
-    
-
   }
   
-
-  
   render() {
-    // TODO: le nom de l’enemi / tout remanier
+    // TODO: show enemy name
     /*function EnemyCell({ x = 0, y = 0, name = 'Andrew' }) {
       let style = {
         left: 50 * y + (Math.random()*5),
@@ -183,33 +181,42 @@ class Spreadshoot extends React.Component {
     
     return (
       <div className="main">
+        <section className="header">
         
-        <h2><img className="logo" src="logo-400.png" alt="logo" /> <Trans i18nKey="spreadsheet_title" /></h2>
+          <h2><img className="logo" src="logo-400.png" alt="logo" /> <Trans i18nKey="spreadsheet_title" /></h2>
+          
+          <div className='language_selection'>
+              <Translation>
+                {
+                  (t, { i18n }) => (
+                    <div>
+                      <button onClick={() => i18n.changeLanguage('en')}>en</button>
+                      <button onClick={() => i18n.changeLanguage('fr')}>fr</button>
+                    </div>
+                  )
+                }
+              </Translation>
+            </div>
+            <div className="clear" />
+            <p><Trans i18nKey="short_instruction" /></p>
+            {this.state.error ? <p className="error"><Trans i18nKey={this.state.error} /></p> : ''}
+        </section>
+          
+        <hr className="separator" />
         
-        <section className='section_language'>
-            <Translation>
-              {
-                (t, { i18n }) => (
-                  <div>
-                    <button onClick={() => i18n.changeLanguage('en')}>en</button>
-                    <button onClick={() => i18n.changeLanguage('fr')}>fr</button>
-                  </div>
-                )
-              }
-            </Translation>
-          </section>
-        <p><Trans i18nKey="short_instruction" /></p>
+        <section className="body">
         
-        <p><Trans i18nKey="you_are" /> <b>{this.state.name}</b>. <Trans i18nKey="your_score" />: {this.state.score} <Trans i18nKey="points" />. <Trans i18nKey="you_are" /> {this.state.dead ? <Trans i18nKey="dead" /> : <Trans i18nKey="alive" />}.</p>
-        <p>[{debugBox}]</p>
-        <div className="tableContainer">
-          {/*<div className="enemyLayer">
-              {this.state.enemies.length > 0 ? this.state.enemies.map(function(item, index){
-                    return <EnemyCell key={index} x={item.x} y={item.y} enemyId={item.id} />;
-              }): ''}
-          </div>*/}
-          <HotTable ref={this.hotTableComponent} id={this.id} settings={this.hotSettings} tabIndex="0"  />
-        </div>
+          <p><Trans i18nKey="you_are" /> <b>{this.state.name}</b>. <Trans i18nKey="your_score" />: {this.state.score} <Trans i18nKey="points" />. <Trans i18nKey="you_are" /> {this.state.dead ? <Trans i18nKey="dead" /> : <Trans i18nKey="alive" />}.</p>
+          <p>[{debugBox}]</p>
+          <div className="tableContainer">
+            {/*<div className="enemyLayer">
+                {this.state.enemies.length > 0 ? this.state.enemies.map(function(item, index){
+                      return <EnemyCell key={index} x={item.x} y={item.y} enemyId={item.id} />;
+                }): ''}
+            </div>*/}
+            <HotTable ref={this.hotTableComponent} id={this.id} settings={this.hotSettings} tabIndex="0"  />
+          </div>
+        </section>
       </div>
     );
   }
