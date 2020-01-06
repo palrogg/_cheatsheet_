@@ -18,7 +18,7 @@ const ENDPOINT = (process.env.NODE_ENV==="development")
 const NAME_LIST = ['Dominique', 'Roger', 'Claude', 'Chantal', 'Alfred'];
 const COLOR_LIST = ['red', 'green', 'blue', 'orange', 'purple'];
 
-class Spreadshoot extends React.Component {
+class Spreadshoot extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -99,6 +99,12 @@ class Spreadshoot extends React.Component {
             console.log(entity);
             this.setState({name: NAME_LIST[entity.nameId], nameId: entity.nameId});
             this.hotTableComponent.current.hotInstance.selectCell(entity.y, entity.x);
+            
+            // for debug
+            // setTimeout( () => {
+            //   this.hotTableComponent.current.hotInstance.setCellMeta(3, 3, 'className', 'c-enemy ');
+            //   this.hotTableComponent.current.hotInstance.render();
+            // }, 500);
           }else{
             // enemy: we draw him
             console.log('entity add: other player at position', entity.x, ',', entity.y, NAME_LIST[entity.nameId])
@@ -122,6 +128,7 @@ class Spreadshoot extends React.Component {
           }
           
           entity.onChange = (changes) => {
+            
             if (!this.hotTableComponent.current){
               console.error('No current hotTable')
               this.error = 'Please reload the page';
@@ -129,8 +136,10 @@ class Spreadshoot extends React.Component {
             }
             
             if (sessionId === room.sessionId) {
+              
               // Player moved
               this.hotTableComponent.current.hotInstance.selectCell(entity.y, entity.x);
+              
               this.setState({score: entity.score, dead: entity.dead, deaths: entity.deaths});
               
               // Mort du joueur
@@ -218,7 +227,7 @@ class Spreadshoot extends React.Component {
           <h1><img className="logo" src="logo-400.png" alt="Spreadshoot" /></h1>
           <h2><Trans i18nKey="spreadsheet_title" /><br /><span className="menu" title="nope"><Trans i18nKey="fake_menu" /></span></h2>
           
-          <button className="share" title="nope"><Trans i18nKey="share" /></button>
+          <button className="share" title="nope"><span role="img" aria-label="link">🔗</span> <Trans i18nKey="share" /></button>
           <div className='language_selection'>
               <Translation>
                 {
