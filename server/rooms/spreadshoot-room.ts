@@ -67,6 +67,8 @@ export class SpreadshootRoom extends Room {
       console.log('Name id will be', playerNameId);
       this.state.entities[client.sessionId] = new Player({x: 1, nameId: playerNameId});
       this.state.entities[client.sessionId].nameId = playerNameId;
+      
+      this.send(client, { message: "You won!" });
     }
 
     onLeave (client) {
@@ -115,6 +117,7 @@ export class SpreadshootRoom extends Room {
     // TODO: gestion deplacements
     onMessage (client, data) {
         console.log("Message from", client.sessionId, ":", data);
+        this.send(client, { message: "You won!" });
         
         if(this.state.entities[client.sessionId].dead){
           return;

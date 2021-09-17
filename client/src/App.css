@@ -84,6 +84,12 @@ hr.separator {
   border: 2px solid green;
 }
 
+.c-player {
+  box-shadow: 0 0 0 2px blue inset !important;
+  /* border: 2px solid green !important; */
+}
+
+
 .c-enemy {
   box-shadow: 0 0 0 2px green inset !important;
   /* border: 2px solid green !important; */

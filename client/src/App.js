@@ -22,6 +22,7 @@ class Spreadshoot extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
+      room: null,
       name: '',
       playerId: 'en attente',
       roomId: 'en attente',
@@ -85,6 +86,11 @@ class Spreadshoot extends React.PureComponent {
       sendMessage = function(keycode){
         room.send({ keycode: keycode });
       }
+      
+      room.onMessage((message) => {
+        console.log("message received from server");
+        console.log(message);
+      });
       
       room.state.entities.onAdd = (entity, sessionId: string) => {
           if (!this.hotTableComponent.current){
@@ -180,6 +186,11 @@ class Spreadshoot extends React.PureComponent {
     
     // On ecoute les keyboard events
     Handsontable.hooks.add('beforeKeyDown', sendKey);
+  }
+  
+  componentWillUnmount() {
+    console.log('Component Unmount');
+    // room.leave();
   }
   
   render() {

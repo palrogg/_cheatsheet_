@@ -1,5 +1,6 @@
 import path from 'path';
 import express from 'express';
+import rateLimit from 'express-rate-limit';
 import serveIndex from 'serve-index';
 import cors from 'cors';
 import { createServer } from 'http';
@@ -11,6 +12,12 @@ import { SpreadshootRoom } from "./rooms/spreadshoot-room";
 
 const port = Number(process.env.PORT || 2567) + Number(process.env.NODE_APP_INSTANCE || 0);
 const app = express();
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100
+});
+app.use("/matchmake/", apiLimiter);
 
 app.use(cors());
 app.use(express.json());
